@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Healthognition - Terms & Conditions</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f8fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px 40px;
+      margin: 40px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 25px;
+    }
+
+    /* This is the scrollable box that shows the Terms & Conditions*/
+    .terms-text {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      background-color: #fdfdfd;
+    }
+    /* Styles the checkbox label and the checkbox itself */
+    label {
+      font-weight: 500;
+      color: #34495e;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-right: 10px;
+    }
+
+    button[type="submit"] {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      font-size: 1.2rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Terms & Conditions</h1>
+
+    <!-- This box contains the actual terms and conditions text shown to the user. -->
+    <div class="terms-text">
+      <p>
+        Please read the terms and conditions carefully before proceeding. By checking the box below, you agree to our terms, privacy policy, and the use of this diagnosis system as informational support only. It does not replace professional medical advice.
+      </p>
+      <p>
+        The system processes your data locally in your browser and does not transmit it to any server.
+      </p>
+      <p>
+        Use this system at your own risk.
+      </p>
+    </div>
+
+    <!-- This form lets the user agree to the terms before going to the next page. -->
+    <form id="terms-form">
+      <label>
+        <!-- Checkbox for the user to agree. -->
+        <input type="checkbox" id="agree" name="agree" />
+        I agree to the Terms & Conditions *
+      </label>
+
+      <button type="submit">Next</button>
+    </form>
+  </div>
+
+  <script>
+    // Gets the form using its ID so we can handle the submit action.
+    const form = document.getElementById("terms-form");
+
+    // When the page loads:It checks if the user already accepted the terms earlier by looking into localStorage.If yes, it pre-checks the checkbox.
+    window.addEventListener("DOMContentLoaded", () => {
+      const saved = JSON.parse(localStorage.getItem("termsAccepted") || "false");
+      if (saved) {
+        document.getElementById("agree").checked = true;
+      }
+    });
+
+    //Prevents the default form submission.
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const agree = document.getElementById("agree").checked;
+
+      //If the checkbox is not checked, it shows an alert.Prevents moving forward unless the user agrees.
+      if (!agree) {
+        alert("You must agree to the Terms & Conditions to proceed.");
+        return;
+      }
+
+      localStorage.setItem("termsAccepted", true); //Saves the agreement status in the browser's localStorage.
+      window.location.href = "user-persona.html";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Diagnosis Results</title>  
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f9fc;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 480px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px 30px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    h1 {
+      text-align: center;
+      color: #005f73;
+      margin-bottom: 24px;
+    }
+    h2 {
+      color: #0a9396;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #94d2bd;
+      padding-bottom: 4px;
+    }
+    ul {
+      list-style-type: disc;
+      margin-left: 20px;
+      margin-bottom: 20px;
+    }
+    p {
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    button {
+      background-color: #0a9396;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+    }
+    button:hover,
+    button:focus {
+      background-color: #005f73;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Diagnosis Results</h1>
+
+    <!-- A section for displaying selected symptoms -->
+    <section>
+      <h2>Selected Symptoms</h2>
+      <ul id="symptoms-list"><li>Loading...</li></ul>
+    </section>
+
+    <!-- Section for user medical history -->
+    <section>
+      <h2>User History</h2>
+      <ul id="history-list"><li>Loading...</li></ul>
+    </section>
+
+    <!-- Displays the diagnosis result here later. -->
+    <section>
+      <h2>Diagnosis</h2>
+      <div id="diagnosis-text">Calculating diagnosis...</div>
+    </section>
+
+    <!-- Displays how urgent the diagnosis is. -->
+    <section>
+      <h2>Urgency</h2>
+      <div id="urgency-text"></div>
+    </section>
+
+    <!-- Two buttons for:Restarting the diagnosis process.Downloading the report. -->
+    <button id="restart-btn">Restart</button>
+    <button id="download-btn">Download Report</button>
+  </div>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      // Reads stored symptoms from the browser's local storage and parses it from text to object. If not present, uses an empty object.
+      const symptomData = JSON.parse(localStorage.getItem("symptoms") || "{}");
+
+      //Attempts to load and parse userHistory (which includes pastDiseases and habits).
+      let historyData = { pastDiseases: [], habits: [] };
+      try {
+        const userHistoryRaw = localStorage.getItem("userHistory");
+        const userHistoryParsed = JSON.parse(userHistoryRaw);
+        //Only updates historyData if the parsed object contains proper arrays.
+        //If there’s an error parsing, it’s shown in the console.
+        if (userHistoryParsed &&
+            Array.isArray(userHistoryParsed.pastDiseases) &&
+            Array.isArray(userHistoryParsed.habits)) {
+          historyData = userHistoryParsed;
+        }
+      } catch(e) {
+        console.error("Error parsing userHistory from localStorage", e);
+      }
+
+      // Breaks symptoms into three categories:manualSymptoms: selected by checkboxes.bodySymptoms: selected from body image.voiceSymptoms: spoken symptoms (split into words by space or comma).
+      const manualSymptoms = symptomData.manual || [];
+      const bodySymptoms = symptomData.body || [];
+      const voiceSymptoms = symptomData.voice
+        ? symptomData.voice.split(/[\s,]+/).map(s => s.trim()).filter(s => s)
+        : [];
+
+      // Combine symptoms and remove duplicates using Set
+      const allSymptoms = [...new Set([...manualSymptoms, ...bodySymptoms, ...voiceSymptoms])];
+
+      // Combine user history arrays and remove duplicates
+      const combinedHistory = [...new Set([...(historyData.pastDiseases || []), ...(historyData.habits || [])])];
+
+      // Helper function to convert all items to lowercase
+      function normalize(arr) {
+        return arr.map(s => s.toLowerCase());
+      }
+
+      const normalizedSymptoms = normalize(allSymptoms);
+      const normalizedHistory = normalize(combinedHistory);
+
+      // This array contains multiple rules, each with:symptoms,diseases,diagnosis,urgency.
+      const diagnosisRules = [
+        {
+          symptoms: ["fever", "cough", "shortness of breath", "fatigue"],
+          diseases: [],
+          diagnosis: "Possible Respiratory Infection (e.g., Flu, COVID-19).",
+          urgency: "Urgent - Please consult a healthcare provider immediately."
+        },
+        {
+          symptoms: ["chest pain", "shortness of breath", "dizziness"],
+          diseases: [],
+          diagnosis: "Possible cardiac issue (e.g., angina, heart attack).",
+          urgency: "Critical - Seek emergency care immediately."
+        },
+        {
+          symptoms: ["fatigue", "muscle ache", "back pain"],
+          diseases: ["diabetes"],
+          diagnosis: "Diabetes-related fatigue and muscle pain.",
+          urgency: "Moderate - Consult your doctor soon."
+        },
+        {
+          symptoms: ["nausea", "stomach pain", "vomiting"],
+          diseases: [],
+          diagnosis: "Possible gastrointestinal disturbance or infection.",
+          urgency: "Mild - Monitor symptoms and rest."
+        },
+        {
+          symptoms: ["headache", "dizziness"],
+          diseases: ["hypertension"],
+          diagnosis: "Symptoms may be related to hypertension.",
+          urgency: "Moderate - Monitor blood pressure and consult your doctor."
+        },
+        {
+          symptoms: ["leg pain", "swelling"],
+          diseases: ["diabetes", "hypertension"],
+          diagnosis: "Possible peripheral artery disease or circulation issues.",
+          urgency: "High - Medical consultation advised."
+        },
+        {
+          symptoms: ["persistent cough", "wheezing"],
+          diseases: ["smoking", "asthma"],
+          diagnosis: "Possible chronic respiratory condition (e.g., COPD, asthma).",
+          urgency: "Advisory - Seek medical evaluation."
+        },
+        {
+          symptoms: ["joint pain", "swelling"],
+          diseases: ["arthritis"],
+          diagnosis: "Symptoms consistent with arthritis.",
+          urgency: "Moderate - Consult a rheumatologist."
+        },
+        {
+          symptoms: ["fever", "rash"],
+          diseases: [],
+          diagnosis: "Possible infectious disease or allergic reaction.",
+          urgency: "Moderate - Monitor and consult healthcare provider."
+        },
+        {
+          symptoms: [],
+          diseases: ["hypertension"],
+          diagnosis: "Hypertension detected in history. Monitor blood pressure regularly.",
+          urgency: "Moderate - Routine medical checkups recommended."
+        },
+        {
+          symptoms: [],
+          diseases: ["smoking"],
+          diagnosis: "Smoking habit detected. Increased risk for respiratory and cardiovascular diseases.",
+          urgency: "Advisory - Consider cessation programs."
+        },
+        {
+          symptoms: [],
+          diseases: ["diabetes"],
+          diagnosis: "Diabetes history present. Maintain blood sugar control and regular checkups.",
+          urgency: "Moderate - Follow diabetes management plan."
+        },
+        {
+          symptoms: ["anxiety", "restlessness", "insomnia"],
+          diseases: [],
+          diagnosis: "Possible anxiety or stress-related symptoms.",
+          urgency: "Mild - Consider stress management and counseling."
+        }
+      ];
+
+      //A rule is considered matched if any of its symptoms or diseases match the user's input.
+      function ruleMatches(rule) {
+        const symptomMatch = rule.symptoms.some(symp => normalizedSymptoms.includes(symp.toLowerCase()));
+        const diseaseMatch = rule.diseases.some(dis => normalizedHistory.includes(dis.toLowerCase()));
+        return symptomMatch || diseaseMatch;
+      }
+
+      //Filters and keeps only the rules that match.
+      const matchedDiagnoses = diagnosisRules.filter(ruleMatches);
+
+      // Selects the relevant elements from the page.
+      const symptomsList = document.getElementById("symptoms-list");
+      const historyList = document.getElementById("history-list");
+      const diagnosisContainer = document.getElementById("diagnosis-text");
+      const urgencyContainer = document.getElementById("urgency-text");
+
+      //Displays all collected symptoms, or “None” if empty.
+      symptomsList.innerHTML = allSymptoms.length > 0
+        ? allSymptoms.map(s => `<li>${s}</li>`).join("")
+        : "<li>None</li>";
+
+      historyList.innerHTML = combinedHistory.length > 0
+        ? combinedHistory.map(h => `<li>${h}</li>`).join("")
+        : "<li>None</li>";
+
+      //If no rule matched: shows a default message.Otherwise: displays all matched diagnoses and urgency levels.
+      if (matchedDiagnoses.length === 0) {
+        diagnosisContainer.textContent = "No specific diagnosis could be made based on your input.";
+        urgencyContainer.textContent = "";
+      } else {
+        diagnosisContainer.innerHTML = matchedDiagnoses.map(d => `<p>${d.diagnosis}</p>`).join("");
+        urgencyContainer.innerHTML = matchedDiagnoses.map(d => `<p><strong>Urgency:</strong> ${d.urgency}</p>`).join("");
+      }
+
+      // When Restart is clicked, go back to symptom selection page.
+      document.getElementById("restart-btn").addEventListener("click", () => {
+        window.location.href = "symptom-selection.html"; 
+      });
+
+      // Download report button logic
+      document.getElementById("download-btn").addEventListener("click", () => {
+        //Starts building the report as plain text.
+        let reportText = "Diagnosis Report\n\n";
+
+        //Adds symptoms section.
+        reportText += "Selected Symptoms:\n";
+        reportText += allSymptoms.length > 0 ? allSymptoms.join(", ") : "None";
+        reportText += "\n\n";
+
+        //Adds history section.
+        reportText += "User History:\n";
+        reportText += combinedHistory.length > 0 ? combinedHistory.join(", ") : "None";
+        reportText += "\n\n";
+
+        //Adds diagnosis and urgency info depending on whether matches exist.
+        if (matchedDiagnoses.length === 0) {
+          reportText += "Diagnosis:\nNo specific diagnosis could be made based on your input.\n\n";
+          reportText += "Urgency:\nN/A\n";
+        } else {
+          reportText += "Diagnosis:\n";
+          matchedDiagnoses.forEach((d, i) => {
+            reportText += `${i + 1}. ${d.diagnosis}\n`;
+          });
+          reportText += "\nUrgency:\n";
+          matchedDiagnoses.forEach((d, i) => {
+            reportText += `${i + 1}. ${d.urgency}\n`;
+          });
+        }
+
+        //Creates a downloadable file from the text.
+        const blob = new Blob([reportText], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        //Creates a hidden link, clicks it to start download, then cleans up.
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "diagnosis_report.txt";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /> 
+  <!-- Ensures that all types of characters (letters, emojis, symbols) are displayed properly using UTF-8 encoding. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- This makes sure the page is responsive, meaning it looks good on both mobile and desktop devices. -->
+  <title>Healthognition - Landing</title>
+  <link rel="stylesheet" href="style.css" /> <!-- Links to an external CSS file (common styles)-->
+  <style>
+    /* This styles the whole body of the page */
+    body {   
+      font-family: Arial, sans-serif;
+      background-color: #f5f8fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    /* This is the main box that holds all the content */
+    .container {
+      background: white;
+      padding: 30px 40px;
+      margin: 40px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      max-width: 700px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    /* Styles the main heading */
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 25px;
+    }
+    /* Styles sub-headings */
+    h2 {
+      color: #34495e;
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
+    /* Styles paragraphs and bullet lists  */
+    p, ul {
+      color: #555;
+      line-height: 1.5;
+      font-size: 1rem;
+    }
+    /* Adds a left indent (space) to bullet lists so bullets aren’t too close to the edge. */
+    ul {
+      padding-left: 20px;
+    }
+    /* Styles the blue Start Diagnosis button */
+    button#start-btn {
+      display: block;
+      margin: 40px auto 0 auto;
+      background-color: #3498db;
+      color: white;
+      font-size: 1.2rem;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    /* Changes button color to a darker blue when hover over it. */
+    button#start-btn:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Healthognition</h1>
+    <!-- Defines a section for Mission and Vision. -->
+    <section id="mission-vision">
+      <h2>Our Mission</h2>
+      <p>
+        To provide accurate, accessible, and instant health diagnosis assistance using advanced technology.
+      </p>
+
+      <h2>Our Vision</h2>
+      <p>
+        Empower everyone to understand their health better and seek timely care.
+      </p>
+    </section>
+
+    <!-- Defines a section for Features. -->
+    <section id="features">
+      <h2>Key Features</h2>
+      <ul>
+        <li>Multi-modal symptom input: voice, manual, and body map selection</li>
+        <li>Personalized diagnosis based on your health history and symptoms</li>
+        <li>Comprehensive, easy-to-understand results with urgency indicators</li>
+        <li>Downloadable report for your records</li>
+      </ul>
+    </section>
+
+    <button id="start-btn">Start Diagnosis</button>
+  </div>
+  <!-- JavaScript code -->
+  <script>
+    // When the Start Diagnosis button is clicked, do the following
+    document.getElementById("start-btn").addEventListener("click", () => {
+      // Clears any previously stored user data (like symptoms or personal info) so the diagnosis starts fresh.
+      localStorage.clear(); 
+      //Sends the user to the next page
+      window.location.href = "user-details.html";
+    });
+  </script>
+</body>
+</html>
