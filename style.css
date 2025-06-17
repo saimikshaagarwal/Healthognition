@@ -1,0 +1,159 @@
+/* style.css */
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f7f9fc;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 480px;
+  margin: 40px auto;
+  background: white;
+  padding: 20px 30px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+h1 {
+  text-align: center;
+  color: #005f73;
+  margin-bottom: 24px;
+}
+
+h2 {
+  color: #0a9396;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #94d2bd;
+  padding-bottom: 4px;
+}
+
+p {
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  border-color: #0a9396;
+  outline: none;
+}
+
+button {
+  background-color: #0a9396;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+}
+
+button:hover,
+button:focus {
+  background-color: #005f73;
+}
+
+input[type="checkbox"] {
+  margin-right: 8px;
+  transform: scale(1.1);
+  vertical-align: middle;
+}
+
+.error {
+  color: #d8000c;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+section {
+  margin-bottom: 24px;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 6px;
+  box-shadow: 0 0 5px #ccc;
+}
+
+ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-top: 0;
+}
+
+#diagnosis-text p {
+  background: #ffe0e0;
+  border-left: 4px solid #f44336;
+  padding: 8px 12px;
+  margin: 8px 0;
+  border-radius: 4px;
+}
+
+#buttons-container {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+#download-btn {
+  background-color: #4caf50;
+  width: auto;
+  padding: 10px 25px;
+  margin-right: 10px;
+}
+
+#download-btn:hover {
+  background-color: #388e3c;
+}
+
+#restart-btn {
+  background-color: #f44336;
+  width: auto;
+  padding: 10px 25px;
+}
+
+#restart-btn:hover {
+  background-color: #d32f2f;
+}
+
+@media (max-width: 500px) {
+  .container {
+    margin: 20px 15px;
+    padding: 15px 20px;
+  }
+
+  #download-btn, #restart-btn {
+    width: 48%;
+    margin: 6px 1%;
+    display: inline-block;
+  }
+}
