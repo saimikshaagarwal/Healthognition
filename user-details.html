@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Healthognition - User Details</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f8fa;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav {
+      background-color: #0a9396;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    nav h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    nav h1 a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hamburger div {
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      margin: 4px 0;
+    }
+
+    @media screen and (max-width: 768px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background-color: #0a9396;
+        width: 100%;
+        text-align: right;
+        padding: 10px 0;
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .nav-links a {
+        padding: 10px 20px;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    .container {
+      background: white;
+      padding: 30px 40px;
+      margin: 40px auto;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 90%;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      color: #34495e;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+      margin-top: 30px;
+      width: 100%;
+      padding: 12px;
+      font-size: 1.2rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <h1><a href="index.html">Healthognition</a></h1>
+    <div class="hamburger" id="hamburger">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <div class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="symptom-selection.html">New Diagnosis</a>
+      <a href="report-history.html">Report History</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>User Details</h1>
+    <form id="user-details-form" novalidate>
+      <label for="name">Full Name *</label>
+      <input type="text" id="name" required />
+
+      <label for="age">Age *</label>
+      <input type="number" id="age" min="1" max="120" required />
+
+      <label for="gender">Gender *</label>
+      <select id="gender" required>
+        <option value="">-- Select --</option>
+        <option value="Female">Female</option>
+        <option value="Male">Male</option>
+        <option value="Other">Other</option>
+        <option value="Prefer not to say">Prefer not to say</option>
+      </select>
+
+      <label for="weight">Weight (kg) *</label>
+      <input type="number" id="weight" min="1" max="500" required />
+
+      <label for="height">Height (cm) *</label>
+      <input type="number" id="height" min="30" max="300" required />
+
+      <button type="submit">Next</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("user-details-form");
+    const email = localStorage.getItem("loggedInUser");
+    const userKey = `user_${email}`;
+    const userData = JSON.parse(localStorage.getItem(userKey) || '{}');
+
+    window.addEventListener("DOMContentLoaded", () => {
+      if (userData && userData.details) {
+        const d = userData.details;
+        form.name.value = d.name || "";
+        form.age.value = d.age || "";
+        form.gender.value = d.gender || "";
+        form.weight.value = d.weight || "";
+        form.height.value = d.height || "";
+      }
+    });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        alert("Please fill all the required fields correctly.");
+        return;
+      }
+
+      const updatedDetails = {
+        name: form.name.value.trim(),
+        age: form.age.value,
+        gender: form.gender.value,
+        weight: form.weight.value,
+        height: form.height.value
+      };
+
+      userData.details = updatedDetails;
+      localStorage.setItem(userKey, JSON.stringify(userData));
+      window.location.href = "terms.html";
+    });
+
+    const hamburger = document.getElementById("hamburger");
+    const navLinks = document.getElementById("nav-links");
+
+    hamburger.addEventListener("click", () => {
+      navLinks.classList.toggle("active");
+    });
+  </script>
+</body>
+</html>

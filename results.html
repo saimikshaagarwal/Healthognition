@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Diagnosis Results</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f9fc;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    nav {
+      background-color: #0a9396;
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    nav h1 {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    nav h1 a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+
+      .nav-links {
+        flex-direction: column;
+        width: 100%;
+        display: none;
+        margin-top: 10px;
+      }
+
+      .nav-links.show {
+        display: flex;
+      }
+
+      nav {
+        align-items: flex-start;
+      }
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px 30px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #005f73;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      color: #0a9396;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #94d2bd;
+      padding-bottom: 4px;
+    }
+
+    ul {
+      list-style-type: disc;
+      margin-left: 20px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    button {
+      background-color: #0a9396;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    button:hover {
+      background-color: #005f73;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <h1><a href="index.html">Healthognition</a></h1>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <div class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="symptom-selection.html">New Diagnosis</a>
+      <a href="report-history.html">Report History</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Diagnosis Results</h1>
+
+    <section><h2>User Info</h2><p id="user-info">Loading...</p></section>
+    <section><h2>Selected Symptoms</h2><ul id="symptoms-list"><li>Loading...</li></ul></section>
+    <section><h2>User History</h2><ul id="history-list"><li>Loading...</li></ul></section>
+    <section><h2>Diagnosis</h2><div id="diagnosis-text">Calculating...</div></section>
+    <section><h2>Urgency</h2><div id="urgency-text">...</div></section>
+    <section><h2>Body Mass Index (BMI)</h2><div id="bmi-text">Calculating...</div></section>
+    <section><h2>Suggested Foods</h2><ul id="suggested-foods"><li>Loading...</li></ul></section>
+    <section><h2>Prohibited Foods</h2><ul id="prohibited-foods"><li>Loading...</li></ul></section>
+
+    <button id="restart-btn">Restart</button>
+    <button id="download-btn">Download Report</button>
+  </div>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("nav-links").classList.toggle("show");
+    }
+
+    const email = localStorage.getItem("loggedInUser");
+    const userKey = `user_${email}`;
+    const userData = JSON.parse(localStorage.getItem(userKey) || '{}');
+    const userDetails = userData.details || {};
+    const historyData = userData.history || { pastDiseases: [], habits: [] };
+    const symptomData = JSON.parse(localStorage.getItem("symptoms") || '{}');
+
+    const allSymptoms = [...new Set([...(symptomData.manual || []), ...(symptomData.body || []), ...(symptomData.voice ? symptomData.voice.split(/[ ,]+/) : [])])];
+    const combinedHistory = [...new Set([...(historyData.pastDiseases || []), ...(historyData.habits || [])])];
+    const normalize = arr => arr.map(s => s.toLowerCase());
+
+    const rules = [
+      { symptoms: ["fever", "cough", "fatigue"], diseases: [], diagnosis: "Possible flu or viral infection.", urgency: "Moderate" },
+      { symptoms: ["chest pain", "shortness of breath"], diseases: ["smoking"], diagnosis: "Possible cardiovascular risk.", urgency: "High" },
+      { symptoms: ["nausea", "vomiting", "stomach pain"], diseases: [], diagnosis: "Gastrointestinal issue likely.", urgency: "Mild" },
+      { symptoms: ["fatigue", "back pain"], diseases: ["diabetes"], diagnosis: "Diabetes-related fatigue and back pain.", urgency: "Moderate" },
+      { symptoms: ["dizziness", "headache"], diseases: ["hypertension"], diagnosis: "Symptoms may relate to high blood pressure.", urgency: "Moderate" },
+      { symptoms: ["joint pain", "swelling"], diseases: ["arthritis"], diagnosis: "Likely arthritis flare-up.", urgency: "Moderate" }
+    ];
+
+    const foodAdvice = {
+      flu: { suggest: ["Soups", "Warm fluids", "Citrus fruits"], avoid: ["Cold drinks", "Processed food"] },
+      cardiovascular: { suggest: ["Oats", "Nuts", "Leafy greens"], avoid: ["Red meat", "Salt"] },
+      gastrointestinal: { suggest: ["Bananas", "Rice", "Toast"], avoid: ["Dairy", "Spicy foods"] },
+      diabetes: { suggest: ["Whole grains", "Vegetables"], avoid: ["Sugar", "White bread"] },
+      hypertension: { suggest: ["Low sodium food"], avoid: ["Salt", "Canned food"] },
+      arthritis: { suggest: ["Omega-3 foods"], avoid: ["Sugar", "Fried foods"] }
+    };
+
+    const matched = rules.filter(rule => {
+      const symMatch = rule.symptoms.some(s => normalize(allSymptoms).includes(s.toLowerCase()));
+      const disMatch = rule.diseases.some(d => normalize(combinedHistory).includes(d.toLowerCase()));
+      return symMatch || disMatch;
+    });
+
+    document.getElementById("symptoms-list").innerHTML = allSymptoms.length ? allSymptoms.map(s => `<li>${s}</li>`).join("") : "<li>None</li>";
+    document.getElementById("history-list").innerHTML = combinedHistory.length ? combinedHistory.map(s => `<li>${s}</li>`).join("") : "<li>None</li>";
+    document.getElementById("diagnosis-text").innerHTML = matched.length ? matched.map(m => `<p>${m.diagnosis}</p>`).join("") : "No specific diagnosis found.";
+    document.getElementById("urgency-text").innerHTML = matched.length ? matched.map(m => `<p><strong>${m.urgency}</strong></p>`).join("") : "N/A";
+
+    const h = parseFloat(userDetails.height);
+    const w = parseFloat(userDetails.weight);
+    let bmiVal = "Unavailable";
+    if (!isNaN(h) && !isNaN(w)) {
+      const bmi = (w / ((h / 100) ** 2)).toFixed(2);
+      bmiVal = bmi;
+    }
+    document.getElementById("bmi-text").textContent = bmiVal;
+
+    document.getElementById("user-info").innerHTML = `
+      <strong>Name:</strong> ${userDetails.name || "N/A"}<br>
+      <strong>Age:</strong> ${userDetails.age || "N/A"}<br>
+      <strong>Gender:</strong> ${userDetails.gender || "N/A"}<br>
+      <strong>Weight:</strong> ${userDetails.weight || "N/A"} kg<br>
+      <strong>Height:</strong> ${userDetails.height || "N/A"} cm`;
+
+    const suggestedSet = new Set();
+    const prohibitedSet = new Set();
+    matched.forEach(rule => {
+      const diag = rule.diagnosis.toLowerCase();
+      for (const key in foodAdvice) {
+        if (diag.includes(key)) {
+          foodAdvice[key].suggest.forEach(f => suggestedSet.add(f));
+          foodAdvice[key].avoid.forEach(f => prohibitedSet.add(f));
+        }
+      }
+    });
+    document.getElementById("suggested-foods").innerHTML = suggestedSet.size ? Array.from(suggestedSet).map(f => `<li>${f}</li>`).join("") : "<li>No suggestions available.</li>";
+    document.getElementById("prohibited-foods").innerHTML = prohibitedSet.size ? Array.from(prohibitedSet).map(f => `<li>${f}</li>`).join("") : "<li>No restrictions found.</li>";
+
+    const report = {
+      date: new Date().toLocaleString(),
+      symptoms: allSymptoms,
+      history: combinedHistory,
+      diagnosis: matched.map(m => m.diagnosis),
+      urgency: matched.map(m => m.urgency),
+      bmi: bmiVal,
+      suggested: Array.from(suggestedSet),
+      prohibited: Array.from(prohibitedSet),
+      userInfo: userDetails
+    };
+
+    userData.reports = userData.reports || [];
+    userData.reports.push(report);
+    localStorage.setItem(userKey, JSON.stringify(userData));
+
+    document.getElementById("download-btn").addEventListener("click", () => {
+      let text = `Healthognition Report\nDate: ${report.date}\n\n`;
+      text += `Name: ${userDetails.name}\nAge: ${userDetails.age}\nGender: ${userDetails.gender}\n\n`;
+      text += `Weight: ${userDetails.weight} kg\nHeight: ${userDetails.height} cm\nBMI: ${bmiVal}\n\n`;
+      text += `Symptoms: ${allSymptoms.join(", ") || "None"}\n\n`;
+      text += `History: ${combinedHistory.join(", ") || "None"}\n\n`;
+      text += `Diagnosis:\n${report.diagnosis.join("\n") || "None"}\n\n`;
+      text += `Urgency:\n${report.urgency.join("\n") || "None"}\n\n`;
+      text += `Suggested Foods:\n${report.suggested.join(", ") || "N/A"}\n\n`;
+      text += `Prohibited Foods:\n${report.prohibited.join(", ") || "N/A"}\n\n`;
+
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `report_${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("restart-btn").addEventListener("click", () => {
+      localStorage.removeItem("symptoms");
+      window.location.href = "symptom-selection.html";
+    });
+  </script>
+</body>
+</html>

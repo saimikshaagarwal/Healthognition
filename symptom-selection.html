@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Healthognition - Symptom Selection</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: #f7f9fc;
+    }
+
+    nav {
+      background-color: #0a9396;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    nav h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+
+    nav h1 a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hamburger div {
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      margin: 4px 0;
+    }
+
+    @media screen and (max-width: 768px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background-color: #0a9396;
+        width: 100%;
+        text-align: right;
+        padding: 10px 0;
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .nav-links a {
+        padding: 10px 20px;
+      }
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 1em;
+    }
+
+    section {
+      margin-bottom: 20px;
+    }
+
+    img#body-map {
+      max-width: 100%;
+      height: auto;
+    }
+
+    #voice-input {
+      min-height: 50px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      margin-top: 10px;
+    }
+
+    #buttons-container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+      background-color: #0077b6;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005f8a;
+    }
+
+    @media screen and (max-width: 768px) {
+      #buttons-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <h1><a href="index.html">Healthognition</a></h1>
+    <div class="hamburger" id="hamburger">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <div class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="symptom-selection.html">New Diagnosis</a>
+      <a href="report-history.html">Report History</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Symptom Selection</h1>
+    <p>Please select your symptoms by any method below. At least one symptom input is required.</p>
+
+    <section>
+      <h2>Manual Symptom Selection</h2>
+      <select id="manual-symptoms" multiple size="8">
+        <option value="Headache">Headache</option>
+        <option value="Fever">Fever</option>
+        <option value="Cough">Cough</option>
+        <option value="Fatigue">Fatigue</option>
+        <option value="Chest Pain">Chest Pain</option>
+        <option value="Shortness of Breath">Shortness of Breath</option>
+        <option value="Nausea">Nausea</option>
+        <option value="Dizziness">Dizziness</option>
+        <option value="Back Pain">Back Pain</option>
+        <option value="Muscle Ache">Muscle Ache</option>
+        <option value="Neck Pain">Neck Pain</option>
+        <option value="Stiffness">Stiffness</option>
+        <option value="Leg Pain">Leg Pain</option>
+        <option value="Cramps">Cramps</option>
+        <option value="Foot Pain">Foot Pain</option>
+        <option value="Swelling">Swelling</option>
+        <option value="Hand Pain">Hand Pain</option>
+        <option value="Numbness">Numbness</option>
+        <option value="Stomach Pain">Stomach Pain</option>
+        <option value="Sleeplessness">Sleeplessness</option>
+      </select>
+    </section>
+
+    <section>
+      <h2>Select Symptoms by Body Part</h2>
+      <img
+        src="https://img.freepik.com/free-vector/human-anatody-white-background_1308-68254.jpg"
+        alt="Human Body"
+        id="body-map"
+        usemap="#bodymap"
+        width="143"
+        height="356"
+      />
+      <!-- Each area marks a clickable part of the image. When clicked, it shows related symptoms -->
+      <map name="bodymap">
+        <area shape="circle" coords="72,30,18" alt="Head" data-symptoms="Headache,Dizziness,Sleeplessness" />
+        <area shape="rect" coords="62,48,82,65" alt="Neck" data-symptoms="Neck Pain,Stiffness" />
+        <area shape="rect" coords="55,66,88,100" alt="Chest" data-symptoms="Chest Pain,Shortness of Breath" />
+        <area shape="rect" coords="55,100,88,140" alt="Abdomen" data-symptoms="Nausea,Stomach Pain" />
+        <area shape="rect" coords="30,66,54,140" alt="Left Arm" data-symptoms="Muscle Ache,Numbness" />
+        <area shape="rect" coords="89,66,113,140" alt="Right Arm" data-symptoms="Muscle Ache,Numbness" />
+        <area shape="rect" coords="50,140,65,315" alt="Left Leg" data-symptoms="Leg Pain,Cramps" />
+        <area shape="rect" coords="68,140,83,315" alt="Right Leg" data-symptoms="Leg Pain,Cramps" />
+        <area shape="rect" coords="50,315,68,345" alt="Left Foot" data-symptoms="Foot Pain,Swelling" />
+        <area shape="rect" coords="72,315,90,345" alt="Right Foot" data-symptoms="Foot Pain,Swelling" />
+        <area shape="rect" coords="20,100,29,140" alt="Left Hand" data-symptoms="Hand Pain,Numbness" />
+        <area shape="rect" coords="114,100,123,140" alt="Right Hand" data-symptoms="Hand Pain,Numbness" />
+      </map>
+      <div class="symptom-options" id="body-symptom-options"></div>
+    </section>
+
+    <section>
+      <h2>Voice Input</h2>
+      <button id="mic-btn">🎤 Start Recording</button>
+      <div id="voice-input" contenteditable="true" aria-label="Voice input text area"></div>
+      <small>Speak your symptoms and they will appear here.</small>
+    </section>
+
+    <div id="buttons-container">
+      <button id="next-btn">Next</button>
+      <button id="reset-btn">Reset</button>
+    </div>
+  </div>
+
+  <script>
+    const hamburger = document.getElementById("hamburger");
+    const navLinks = document.getElementById("nav-links");
+
+    hamburger.addEventListener("click", () => {
+      navLinks.classList.toggle("active");
+    });
+
+    const manualSelect = document.getElementById("manual-symptoms");
+    const symptomOptionsDiv = document.getElementById("body-symptom-options");
+    const micBtn = document.getElementById("mic-btn");
+    const voiceInputDiv = document.getElementById("voice-input");
+    let recognition;
+    let isRecording = false;
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedSymptoms = JSON.parse(localStorage.getItem("symptoms") || "{}");
+
+      if (savedSymptoms.manual) {
+        Array.from(manualSelect.options).forEach(option => {
+          option.selected = savedSymptoms.manual.includes(option.value);
+        });
+      }
+
+      if (savedSymptoms.body) {
+        showBodySymptomOptions(savedSymptoms.body);
+      }
+
+      if (savedSymptoms.voice) {
+        voiceInputDiv.textContent = savedSymptoms.voice;
+      }
+    });
+
+    document.querySelectorAll("area").forEach(area => {
+      area.addEventListener("click", (e) => {
+        e.preventDefault();
+        const symptoms = e.target.getAttribute("data-symptoms").split(",");
+        showBodySymptomOptions(symptoms);
+      });
+    });
+
+    function showBodySymptomOptions(symptomsArr) {
+      symptomOptionsDiv.innerHTML = "";
+      const saved = JSON.parse(localStorage.getItem("symptoms") || "{}");
+      const savedBody = saved.body || [];
+
+      symptomsArr.forEach(symptom => {
+        const id = "symptom-" + symptom.toLowerCase().replace(/\s+/g, "-");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.id = id;
+        checkbox.name = "body-symptoms";
+        checkbox.value = symptom;
+        if (savedBody.includes(symptom)) checkbox.checked = true;
+
+        const label = document.createElement("label");
+        label.htmlFor = id;
+        label.textContent = symptom;
+
+        const div = document.createElement("div");
+        div.appendChild(checkbox);
+        div.appendChild(label);
+        symptomOptionsDiv.appendChild(div);
+      });
+    }
+
+    if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = "en-US";
+
+      recognition.onstart = () => {
+        isRecording = true;
+        micBtn.textContent = "🛑 Stop Recording";
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript.trim();
+        voiceInputDiv.textContent += (voiceInputDiv.textContent ? " " : "") + transcript;
+      };
+
+      recognition.onerror = (event) => alert("Speech recognition error: " + event.error);
+      recognition.onend = () => {
+        isRecording = false;
+        micBtn.textContent = "🎤 Start Recording";
+      };
+
+      micBtn.addEventListener("click", () => {
+        isRecording ? recognition.stop() : recognition.start();
+      });
+    } else {
+      micBtn.disabled = true;
+      micBtn.textContent = "🎤 Speech Recognition Not Supported";
+    }
+
+    document.getElementById("next-btn").addEventListener("click", () => {
+      const manual = Array.from(manualSelect.selectedOptions).map(o => o.value);
+      const body = Array.from(document.querySelectorAll('input[name="body-symptoms"]:checked')).map(i => i.value);
+      const voice = voiceInputDiv.textContent.trim();
+
+      if (manual.length === 0 && body.length === 0 && voice === "") {
+        alert("Please provide symptoms using at least one input method.");
+        return;
+      }
+
+      localStorage.setItem("symptoms", JSON.stringify({ manual, body, voice }));
+      window.location.href = "results.html";
+    });
+
+    document.getElementById("reset-btn").addEventListener("click", () => {
+      Array.from(manualSelect.options).forEach(opt => opt.selected = false);
+      symptomOptionsDiv.innerHTML = "";
+      voiceInputDiv.textContent = "";
+      localStorage.removeItem("symptoms");
+    });
+  </script>
+</body>
+</html>

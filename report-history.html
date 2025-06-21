@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report History - Healthognition</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f2f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    nav {
+      background-color: #0a9396;
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    nav h1 {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+    nav h1 a {
+      color: white;
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+    .menu-toggle {
+      display: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+      .nav-links {
+        width: 100%;
+        flex-direction: column;
+        display: none;
+        margin-top: 10px;
+      }
+      .nav-links.show {
+        display: flex;
+      }
+      nav {
+        align-items: flex-start;
+      }
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px 30px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    h1 {
+      color: #005f73;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .report-card {
+      border: 1px solid #94d2bd;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+      background-color: #e0fbfc;
+    }
+    .report-card p {
+      margin: 6px 0;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    button.download-btn,
+    button.delete-btn {
+      background-color: #0a9396;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button.download-btn:hover,
+    button.delete-btn:hover {
+      background-color: #007f89;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <h1><a href="index.html">Healthognition</a></h1>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <div class="nav-links" id="nav-links">
+      <a href="index.html">Home</a>
+      <a href="symptom-selection.html">New Diagnosis</a>
+      <a href="report-history.html">Report History</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Report History</h1>
+    <div id="report-history"></div>
+  </div>
+
+  <script>
+    function toggleMenu() {
+      const nav = document.getElementById('nav-links');
+      nav.classList.toggle('show');
+    }
+
+    const email = localStorage.getItem("loggedInUser");
+    const userKey = `user_${email}`;
+    const userData = JSON.parse(localStorage.getItem(userKey) || '{}');
+    let reports = userData.reports || [];
+
+    const container = document.getElementById("report-history");
+
+    function renderReports() {
+      container.innerHTML = "";
+
+      if (reports.length === 0) {
+        container.innerHTML = "<p>No past reports found.</p>";
+        return;
+      }
+
+      reports.slice().reverse().forEach((report, index) => {
+        const trueIndex = reports.length - 1 - index;
+        const card = document.createElement("div");
+        card.className = "report-card";
+        card.innerHTML = `
+          <p><strong>Date:</strong> ${report.date}</p>
+          <div class="btn-group">
+            <button class="download-btn" onclick="downloadReport(${trueIndex})">Download</button>
+            <button class="delete-btn" onclick="deleteReport(${trueIndex})">Delete</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function downloadReport(index) {
+      const r = reports[index];
+      let text = `Healthognition Report\nDate: ${r.date}\n\n`;
+      text += `Name: ${r.userInfo.name}\nAge: ${r.userInfo.age}\nGender: ${r.userInfo.gender}\n`;
+      text += `Weight: ${r.userInfo.weight} kg\nHeight: ${r.userInfo.height} cm\nBMI: ${r.bmi}\n\n`;
+      text += `Symptoms: ${r.symptoms.join(", ")}\n`;
+      text += `History: ${r.history.join(", ")}\n`;
+      text += `\nDiagnosis:\n${r.diagnosis.join("\n")}\n`;
+      text += `\nUrgency:\n${r.urgency.join("\n")}\n`;
+
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const fileName = `report_${r.date.replace(/[: ]/g, "_")}.txt`;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function deleteReport(index) {
+      if (!confirm("Are you sure you want to delete this report?")) return;
+      reports.splice(index, 1);
+      userData.reports = reports;
+      localStorage.setItem(userKey, JSON.stringify(userData));
+      renderReports();
+    }
+
+    renderReports();
+  </script>
+
+</body>
+</html>
