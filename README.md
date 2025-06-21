@@ -11,4 +11,4 @@ A web-based application to provide accurate, accessible, and instant health diag
 
 ## Technology Stack
 
-- **Frontend**: HTML, CSS
+- **Frontend**: HTML, CSS, JavaScript
